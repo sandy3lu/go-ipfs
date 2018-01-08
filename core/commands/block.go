@@ -16,6 +16,8 @@ import (
 	blocks "gx/ipfs/QmYsEQydGrsxNZfAiskvQ76N2xE9hDQtSAkRSynwMiUK3c/go-block-format"
 	"gx/ipfs/QmceUdzxkimdYsgtX733uNgzf1DLHyBKN6ehGSp85ayppM/go-ipfs-cmdkit"
 	cid "gx/ipfs/QmeSrf6pzut73u6zLQkRFQ3ygt3k6XFT2kjdYP8Tnkwwyg/go-cid"
+
+	"github.com/pkg/errors"
 )
 
 type BlockStat struct {
@@ -157,20 +159,6 @@ It reads from stdin, and <key> is a base58 encoded multihash.
 			return
 		}
 
-		var pref cid.Prefix
-		pref.Version = 1
-
-		format, _ := req.Options["format"].(string)
-		formatval, ok := cid.Codecs[format]
-		if !ok {
-			res.SetError(fmt.Errorf("unrecognized format: %s", format), cmdkit.ErrNormal)
-			return
-		}
-		if format == "v0" {
-			pref.Version = 0
-		}
-		pref.Codec = formatval
-
 		mhtype, _ := req.Options["mhtype"].(string)
 		mhtval, ok := mh.Names[mhtype]
 		if !ok {
@@ -178,6 +166,25 @@ It reads from stdin, and <key> is a base58 encoded multihash.
 			res.SetError(err, cmdkit.ErrNormal)
 			return
 		}
+
+		var pref cid.Prefix
+		pref.Version = 1
+
+		format, userFormat := req.Options["format"].(string)
+		formatval, ok := cid.Codecs[format]
+		if !ok {
+			res.SetError(fmt.Errorf("unrecognized format: %s", format), cmdkit.ErrNormal)
+			return
+		}
+		if format == "v0" && (mhtval == mh.SHA2_256 || userFormat) {
+			pref.Version = 0
+		}
+		if mhtval != mh.SHA2_256 && pref.Version == 0 {
+			res.SetError(errors.New("cannot generate CIDv0 with non-sha256 hash function"), cmdkit.ErrNormal)
+			return
+		}
+
+		pref.Codec = formatval
 		pref.MhType = mhtval
 
 		mhlen, ok := req.Options["mhlen"].(int)
