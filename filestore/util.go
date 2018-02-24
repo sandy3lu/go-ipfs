@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/ipfs/go-ipfs/blocks/blockstore"
 	pb "github.com/ipfs/go-ipfs/filestore/pb"
-	dshelp "github.com/ipfs/go-ipfs/thirdparty/ds-help"
 
 	ds "gx/ipfs/QmPpegoMqhAEqjncrzArm7KVWAkCm78rqL2DPuNjhPrshg/go-datastore"
 	dsq "gx/ipfs/QmPpegoMqhAEqjncrzArm7KVWAkCm78rqL2DPuNjhPrshg/go-datastore/query"
+	blockstore "gx/ipfs/QmTVDM4LCSUMFNQzbDLL9zQwp8usE6QHymFdh3h8vL9v6b/go-ipfs-blockstore"
 	cid "gx/ipfs/QmcZfnkapfECQGcLZaf9B79NRg7cRa9EnZh4LSbkCzwNvY/go-cid"
+	dshelp "gx/ipfs/QmdQTPWduSeyveSxeCAte33M592isSW5Z979g81aJphrgn/go-ipfs-ds-help"
 )
 
 // Status is used to identify the state of the block data referenced

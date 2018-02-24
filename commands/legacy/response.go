@@ -7,7 +7,7 @@ import (
 	"reflect"
 	"sync"
 
-	"gx/ipfs/QmPq2D7Yoyev7yeMuMnkEYBqmQuUu5kb91UXPPoiik1Xyp/go-ipfs-cmds"
+	"gx/ipfs/QmabLouZTZwhfALuBcssPvkzhbYGMb4394huT7HY4LQ6d3/go-ipfs-cmds"
 	"gx/ipfs/QmceUdzxkimdYsgtX733uNgzf1DLHyBKN6ehGSp85ayppM/go-ipfs-cmdkit"
 
 	oldcmds "github.com/ipfs/go-ipfs/commands"
@@ -155,7 +155,7 @@ func (r *fakeResponse) SetOutput(v interface{}) {
 	_, isReader := v.(io.Reader)
 
 	if t != nil && t.Kind() != reflect.Chan && !isReader {
-		v = cmds.Single{v}
+		v = cmds.Single{Value: v}
 	}
 
 	r.out = v

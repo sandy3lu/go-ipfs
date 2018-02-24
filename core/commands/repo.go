@@ -9,16 +9,16 @@ import (
 	"strings"
 	"text/tabwriter"
 
-	bstore "github.com/ipfs/go-ipfs/blocks/blockstore"
 	oldcmds "github.com/ipfs/go-ipfs/commands"
+	lgc "github.com/ipfs/go-ipfs/commands/legacy"
 	e "github.com/ipfs/go-ipfs/core/commands/e"
 	corerepo "github.com/ipfs/go-ipfs/core/corerepo"
 	config "github.com/ipfs/go-ipfs/repo/config"
 	fsrepo "github.com/ipfs/go-ipfs/repo/fsrepo"
 	lockfile "github.com/ipfs/go-ipfs/repo/fsrepo/lock"
 
-	lgc "github.com/ipfs/go-ipfs/commands/legacy"
-	cmds "gx/ipfs/QmPq2D7Yoyev7yeMuMnkEYBqmQuUu5kb91UXPPoiik1Xyp/go-ipfs-cmds"
+	bstore "gx/ipfs/QmTVDM4LCSUMFNQzbDLL9zQwp8usE6QHymFdh3h8vL9v6b/go-ipfs-blockstore"
+	cmds "gx/ipfs/QmabLouZTZwhfALuBcssPvkzhbYGMb4394huT7HY4LQ6d3/go-ipfs-cmds"
 	cid "gx/ipfs/QmcZfnkapfECQGcLZaf9B79NRg7cRa9EnZh4LSbkCzwNvY/go-cid"
 	cmdkit "gx/ipfs/QmceUdzxkimdYsgtX733uNgzf1DLHyBKN6ehGSp85ayppM/go-ipfs-cmdkit"
 )

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 
-	bstore "github.com/ipfs/go-ipfs/blocks/blockstore"
 	bserv "github.com/ipfs/go-ipfs/blockservice"
 	offline "github.com/ipfs/go-ipfs/exchange/offline"
 	dag "github.com/ipfs/go-ipfs/merkledag"
@@ -12,9 +11,12 @@ import (
 
 	ds "gx/ipfs/QmPpegoMqhAEqjncrzArm7KVWAkCm78rqL2DPuNjhPrshg/go-datastore"
 	syncds "gx/ipfs/QmPpegoMqhAEqjncrzArm7KVWAkCm78rqL2DPuNjhPrshg/go-datastore/sync"
+	bstore "gx/ipfs/QmTVDM4LCSUMFNQzbDLL9zQwp8usE6QHymFdh3h8vL9v6b/go-ipfs-blockstore"
 	ipld "gx/ipfs/Qme5bWv7wtjUNGsK2BNGVUFPKiuxWrsqrtvYwCLRw8YFES/go-ipld-format"
 )
 
+// Editor represents a ProtoNode tree editor and provides methods to
+// modify it.
 type Editor struct {
 	root *dag.ProtoNode
 
@@ -83,6 +85,7 @@ func addLink(ctx context.Context, ds ipld.DAGService, root *dag.ProtoNode, child
 	return root, nil
 }
 
+// InsertNodeAtPath inserts a new node in the tree and replaces the current root with the new one.
 func (e *Editor) InsertNodeAtPath(ctx context.Context, pth string, toinsert ipld.Node, create func() *dag.ProtoNode) error {
 	splpath := path.SplitList(pth)
 	nd, err := e.insertNodeAtPath(ctx, e.root, splpath, toinsert, create)
@@ -137,6 +140,8 @@ func (e *Editor) insertNodeAtPath(ctx context.Context, root *dag.ProtoNode, path
 	return root, nil
 }
 
+// RmLink removes the link with the given name and updates the root node of
+// the editor.
 func (e *Editor) RmLink(ctx context.Context, pth string) error {
 	splpath := path.SplitList(pth)
 	nd, err := e.rmLink(ctx, e.root, splpath)

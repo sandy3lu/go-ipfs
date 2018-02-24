@@ -7,12 +7,12 @@ import (
 
 	notifications "github.com/ipfs/go-ipfs/exchange/bitswap/notifications"
 
-	loggables "gx/ipfs/QmQ3c5AP6yjqD3E4get5atkvfaUU4rubWquoL2e8ycjUSu/go-libp2p-loggables"
-	logging "gx/ipfs/QmSpJByNKFX1sCsHBEp3R73FL4NF6FnQTEGyNAXHm2GS52/go-log"
+	logging "gx/ipfs/QmRb5jh8z2E8hMGN2tkvs1yHynUanqnZ3UeKwgN1i9P1F8/go-log"
 	lru "gx/ipfs/QmVYxfoJQiZijTgPNHCHgHELvQpbsJNTg6Crmc3dQkj3yy/golang-lru"
-	peer "gx/ipfs/Qma7H6RW8wRrfZpNSXwxYGcd1E149s42FpWNpDNieSVrnU/go-libp2p-peer"
+	peer "gx/ipfs/QmZoWKhxUmZ2seW4BzX6fJkNR8hh9PsGModr7q171yq2SS/go-libp2p-peer"
 	cid "gx/ipfs/QmcZfnkapfECQGcLZaf9B79NRg7cRa9EnZh4LSbkCzwNvY/go-cid"
 	blocks "gx/ipfs/Qmej7nf81hi2x2tvjRBF3mcp74sQyuDH4VMYDGd1YtXjb2/go-block-format"
+	loggables "gx/ipfs/Qmf9JgVLz46pxPXwG2eWSJpkqVCcjD4rp7zCRi2KP6GTNB/go-libp2p-loggables"
 )
 
 const activeWantsLimit = 16
@@ -83,6 +83,15 @@ func (bs *Bitswap) NewSession(ctx context.Context) *Session {
 }
 
 func (bs *Bitswap) removeSession(s *Session) {
+	s.notif.Shutdown()
+
+	live := make([]*cid.Cid, 0, len(s.liveWants))
+	for c := range s.liveWants {
+		cs, _ := cid.Cast([]byte(c))
+		live = append(live, cs)
+	}
+	bs.CancelWants(live, s.id)
+
 	bs.sessLk.Lock()
 	defer bs.sessLk.Unlock()
 	for i := 0; i < len(bs.sessions); i++ {
@@ -270,8 +279,9 @@ func (s *Session) receiveBlock(ctx context.Context, blk blocks.Block) {
 }
 
 func (s *Session) wantBlocks(ctx context.Context, ks []*cid.Cid) {
+	now := time.Now()
 	for _, c := range ks {
-		s.liveWants[c.KeyString()] = time.Now()
+		s.liveWants[c.KeyString()] = now
 	}
 	s.bs.wm.WantBlocks(ctx, ks, s.activePeersArr, s.id)
 }

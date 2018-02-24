@@ -15,6 +15,7 @@ import (
 	offline "github.com/ipfs/go-ipfs/exchange/offline"
 	dag "github.com/ipfs/go-ipfs/merkledag"
 	path "github.com/ipfs/go-ipfs/path"
+	resolver "github.com/ipfs/go-ipfs/path/resolver"
 	pin "github.com/ipfs/go-ipfs/pin"
 	uio "github.com/ipfs/go-ipfs/unixfs/io"
 
@@ -387,7 +388,7 @@ new pin and removing the old one.
 			return
 		}
 
-		r := &path.Resolver{
+		r := &resolver.Resolver{
 			DAG:         n.DAG,
 			ResolveOnce: uio.ResolveUnixfsOnce,
 		}
@@ -494,14 +495,14 @@ type RefKeyList struct {
 
 func pinLsKeys(args []string, typeStr string, ctx context.Context, n *core.IpfsNode) (map[string]RefKeyObject, error) {
 
-	mode, ok := pin.StringToPinMode(typeStr)
+	mode, ok := pin.StringToMode(typeStr)
 	if !ok {
 		return nil, fmt.Errorf("invalid pin mode '%s'", typeStr)
 	}
 
 	keys := make(map[string]RefKeyObject)
 
-	r := &path.Resolver{
+	r := &resolver.Resolver{
 		DAG:         n.DAG,
 		ResolveOnce: uio.ResolveUnixfsOnce,
 	}

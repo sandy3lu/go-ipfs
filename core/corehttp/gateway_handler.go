@@ -16,15 +16,16 @@ import (
 	coreapi "github.com/ipfs/go-ipfs/core/coreapi"
 	coreiface "github.com/ipfs/go-ipfs/core/coreapi/interface"
 	"github.com/ipfs/go-ipfs/importer"
-	chunk "github.com/ipfs/go-ipfs/importer/chunk"
 	dag "github.com/ipfs/go-ipfs/merkledag"
 	dagutils "github.com/ipfs/go-ipfs/merkledag/utils"
 	path "github.com/ipfs/go-ipfs/path"
+	resolver "github.com/ipfs/go-ipfs/path/resolver"
 	ft "github.com/ipfs/go-ipfs/unixfs"
 	uio "github.com/ipfs/go-ipfs/unixfs/io"
 
 	humanize "gx/ipfs/QmPSBJL4momYnE7DcUyk2DVhD6rH488ZmHBGLbxNdhU44K/go-humanize"
-	routing "gx/ipfs/QmRijoA6zGS98ELTDbGsLWPZbVotYsGbjp3RbXcKCYBeon/go-libp2p-routing"
+	routing "gx/ipfs/QmTiWLZ6Fo5j4KcTVutZJ5KWRRJrbxzmxA4td8NfEdrPh7/go-libp2p-routing"
+	chunker "gx/ipfs/QmWo8jYc19ppG7YoTsrr2kEtLRbARTJho5oNXFTR6B7Peq/go-ipfs-chunker"
 	cid "gx/ipfs/QmcZfnkapfECQGcLZaf9B79NRg7cRa9EnZh4LSbkCzwNvY/go-cid"
 	ipld "gx/ipfs/Qme5bWv7wtjUNGsK2BNGVUFPKiuxWrsqrtvYwCLRw8YFES/go-ipld-format"
 	multibase "gx/ipfs/QmexBtiTTEwwn42Yi6ouKt6VqzpA6wjJgiW1oh9VfaRrup/go-multibase"
@@ -58,7 +59,7 @@ func (i *gatewayHandler) newDagFromReader(r io.Reader) (ipld.Node, error) {
 	// return ufs.AddFromReader(i.node, r.Body)
 	return importer.BuildDagFromReader(
 		i.node.DAG,
-		chunk.DefaultSplitter(r))
+		chunker.DefaultSplitter(r))
 }
 
 // TODO(btc): break this apart into separate handlers using a more expressive muxer
@@ -445,7 +446,7 @@ func (i *gatewayHandler) putHandler(w http.ResponseWriter, r *http.Request) {
 	var newcid *cid.Cid
 	rnode, err := core.Resolve(ctx, i.node.Namesys, i.node.Resolver, rootPath)
 	switch ev := err.(type) {
-	case path.ErrNoLink:
+	case resolver.ErrNoLink:
 		// ev.Node < node where resolve failed
 		// ev.Name < new link
 		// but we need to patch from the root
@@ -599,7 +600,7 @@ func (i *gatewayHandler) addUserHeaders(w http.ResponseWriter) {
 }
 
 func webError(w http.ResponseWriter, message string, err error, defaultCode int) {
-	if _, ok := err.(path.ErrNoLink); ok {
+	if _, ok := err.(resolver.ErrNoLink); ok {
 		webErrorWithCode(w, message, err, http.StatusNotFound)
 	} else if err == routing.ErrNotFound {
 		webErrorWithCode(w, message, err, http.StatusNotFound)
